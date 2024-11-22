@@ -9,6 +9,7 @@
         "compare": "c",
         "cstdint": "c",
         "string.h": "c",
-        "filter.h": "c"
+        "filter.h": "c",
+        "stdio.h": "c"
     }
 }

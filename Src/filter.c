@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stdint.h"
-#define ADC_VALUE_NUM 188
+#define ADC_VALUE_NUM 200
 uint16_t temp_value[ADC_VALUE_NUM];
 
-void Opt_ADC_Value(uint16_t* adc_value, uint16_t* filteredValues, uint8_t MedWindowSize, uint8_t AvgWindowSize,uint16_t num)
+void Opt_ADC_Value(uint16_t* adc_value, uint16_t* filteredValues, uint8_t MedWindowSize, uint8_t AvgWindowSize,uint16_t num,uint16_t pre,uint16_t behind)
 {
-    medianFilter(adc_value, temp_value, num, MedWindowSize);
-    avgFilterArray(temp_value, filteredValues, num, AvgWindowSize);
+    medianFilter(adc_value, temp_value, num+pre+behind, MedWindowSize,0,0);
+    avgFilterArray(temp_value, filteredValues, num, AvgWindowSize,pre,behind);
 }
 
 int compare(const void *a, const void *b)
@@ -17,22 +17,15 @@ int compare(const void *a, const void *b)
     return (*(uint16_t *)a - *(uint16_t *)b);
 }
 
-void medianFilter(uint16_t *input, uint16_t *output, int length, int windowSize)
+void medianFilter(uint16_t *input, uint16_t *output, int length, int windowSize,uint16_t pre,uint16_t behind)
 {
-    if (windowSize == 0)
-    {
-        for (int i = 0; i < length; i++)
-        {
-            output[i] = input[i];
-        }
-        return;
-    }
+ 
 
     int halfWindow = windowSize / 2;
     // uint16_t window[medianFilter_WindowSize];
     uint16_t *window = (uint16_t *)malloc(windowSize * sizeof(uint16_t));
 
-    for (int i = 0; i < length; i++)
+    for (int i = 0; i < length+pre+behind; i++)
     {
 
         for (int j = 0; j < windowSize; j++)
@@ -40,13 +33,14 @@ void medianFilter(uint16_t *input, uint16_t *output, int length, int windowSize)
             int index = i + j - halfWindow;
             if (index < 0)
                 index = 0;
-            if (index >= length)
-                index = length - 1;
+            if (index >= length+pre+behind)
+                index = length+pre+behind - 1;
             window[j] = input[index];
         }
         qsort(window, windowSize, sizeof(uint16_t), compare);
-
-        output[i] = window[halfWindow];
+        if(i>=pre&&i<length+pre){
+          output[i-pre] = window[halfWindow];
+        }
     }
     free(window);
 }
@@ -94,28 +88,24 @@ void avgFilter(uint32_t input, uint32_t *window, uint8_t *count, uint32_t *resul
     *result = total / validCount;
 }
 
-void avgFilterArray(uint16_t *input, uint16_t *output, int length, int windowSize)
+void avgFilterArray(uint16_t *input, uint16_t *output, int length, int windowSize,uint16_t pre,uint16_t behind)
 {
-    if (windowSize == 0)
-    {
-        for (int i = 0; i < length; i++)
-        {
-            output[i] = input[i];
-        }
-        return;
-    }
+
     uint32_t *window = (uint32_t *)malloc(windowSize * sizeof(uint32_t));
     // memset(window, 0, windowSize * sizeof(uint32_t));
     uint8_t count = 0;
-    uint32_t result = 0;
-    for (int i = 0; i < length; i++)
+    uint32_t result = 500;
+    for (int i = 0; i < length+pre+behind; i++)
     {
         for (int w = 0; w < windowSize; w++)
         {
-            if (i + w >= length)
+            if (i + w >= length+pre+behind)
                 break;
-            avgFilter((uint32_t)input[i + w], window, &count, &result, (uint8_t)windowSize);
-            output[i] = (uint16_t)result;
+            avgFilterLazy((uint32_t)input[i + w], window, &count, &result, (uint8_t)windowSize);
+            
+        }
+        if(i>=pre&&i<length+pre){
+            output[i-pre] = (uint16_t)result;
         }
     }
     free(window);
