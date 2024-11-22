@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "stm32f4xx_hal.h": "c",
+        "keyhandle.h": "c",
+        "lcd.h": "c",
+        "lcd_init.h": "c",
+        "lcdfont.h": "c",
+        "spi.h": "c",
+        "compare": "c",
+        "cstdint": "c",
+        "string.h": "c",
+        "filter.h": "c"
+    }
+}

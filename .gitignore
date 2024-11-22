@@ -1,0 +1,20 @@
+# Keil IDE generated files
+*.axf
+*.o
+*.obj
+*.d
+*.dep
+*.bak
+*.bin
+*.elf
+*.map
+*.lst
+*.crf
+# Build directory
+/build/
+# IDE settings folder
+/.vscode/
+# Project configuration files
+*.uvproj
+*.uvopt
+*.uvoptx
