@@ -62,6 +62,7 @@ uint16_t DATABuf[188] = {0};
 uint16_t ProcessedBuf[564] = {0};
 uint8_t ADCState = 0; // 0 Default 1 HalfComplete 2 Complete
 uint8_t ADCProcessedBufState = 0; // 0  1  2 
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -72,8 +73,58 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint16_t max_val = 0;
+uint16_t min_val = UINT16_MAX;
+
+void find_min_max(void) {
+// uint16_t max_pos = 0;
+// uint16_t min_pos = 0;
+    max_val = 0;
+    min_val = UINT16_MAX;
+    // 直接遍历整个ProcessedBuf
+    for(uint16_t i = 0; i < 564; i++) {
+        if(ProcessedBuf[i] > max_val) {
+            max_val = ProcessedBuf[i];
+            // max_pos = i;
+        }
+        if(ProcessedBuf[i] < min_val) {
+            min_val = ProcessedBuf[i];
+            // min_pos = i;
+        }
+    }
+    
+}
+
+
+void detect_r_peaks(uint16_t current_buf_idx);
 uint16_t DrawBuff[180][11];
-void RenderChart();
+void RenderChart(void);
+void draw_x_axis(int time);
+void draw_y_axis(float Vmax);
+
+void draw_data(void){
+  #define FIRST_LINE_Y 3
+#define FIRST_LINE_X 45
+    draw_x_axis(1);
+    draw_y_axis(3.3);
+    LCD_ShowString(FIRST_LINE_X, FIRST_LINE_Y, "Vmax:", BLUE, WHITE, 16, 0);//40+40
+    LCD_ShowString(FIRST_LINE_X+80, FIRST_LINE_Y, "Vmin:", BLUE, WHITE, 16, 0);
+    // LCD_ShowString(FIRST_LINE_X+160+8, FIRST_LINE_Y+5, "AI:", BLUE, WHITE, 16, 0);
+    LCD_ShowString(160+30+15, FIRST_LINE_Y, "OK", BLUE, WHITE, 32, 0);
+		LCD_ShowFloatNum1(FIRST_LINE_X+40, FIRST_LINE_Y, max_val/4095.0*3.3, 3, RED, WHITE, 16);
+		LCD_ShowFloatNum1(FIRST_LINE_X+120, FIRST_LINE_Y, min_val/4095.0*3.3, 3, RED, WHITE, 16);
+		// LCD_ShowFloatNum1(FIRST_LINE_X+200, FIRST_LINE_Y, 23.55, 3, RED, WHITE, 16);
+
+#define SECOND_LINE_Y 20
+#define SECOND_LINE_X 45
+		LCD_ShowString(SECOND_LINE_X, SECOND_LINE_Y, "Freq:", BLUE, WHITE, 16, 0);
+    LCD_ShowIntNum(SECOND_LINE_X+40, SECOND_LINE_Y, 21.2 * 60, 3, RED, WHITE, 16);
+    // LCD_ShowString(SECOND_LINE_X+60+28, SECOND_LINE_Y, "OK", BLUE, BLACK, 16, 0);
+    // LCD_ShowString(FIRST_LINE_X+160, SECOND_LINE_Y, "Poss:", BLUE, WHITE, 16, 0);
+		// LCD_ShowFloatNum1(SECOND_LINE_X+60+28+28, SECOND_LINE_Y, 20.0, 3, RED, WHITE, 16);
+		// LCD_ShowIntNum(SECOND_LINE_X+210, SECOND_LINE_Y, 21.2 * 60, 3, BLUE, WHITE, 16);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -135,20 +186,7 @@ int main(void)
 //		Vave = 0;
 //		int i = 0;
 
-
-		LCD_ShowFloatNum1(60, 40, 2.3, 3, RED, WHITE, 16);
-		LCD_ShowFloatNum1(120, 20, 2.3, 3, RED, WHITE, 16);
-		LCD_ShowFloatNum1(120, 40, 2.3, 3, RED, WHITE, 16);
-
-//		for (i = 0; i < 100; i++)
-//		{
-//			LCD_DrawLine(20 + 2 * i, 220 - 200 * adc_data_copy[start_draw + start_time * i] / start_Vmax, 20 + 2 * (i + 1), 220 - 200 * adc_data_copy[start_draw + start_time * (i + 1)] / start_Vmax, WHITE);
-//		}
-
-//		LCD_ShowFloatNum1(60, 20, Freq, 3, RED, WHITE, 16);
-//		LCD_ShowString(170, 35, "bpm:", BLUE, WHITE, 16, 0);
-//		LCD_ShowIntNum(210, 35, Freq * 60, 3, BLUE, WHITE, 16);
-
+ draw_data();
 //	
 		
 
@@ -161,6 +199,10 @@ int main(void)
 			HAL_UART_Transmit(&huart1, (uint8_t *)header, 4,1);
 			HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564*2);
 	    ADCState=0;    
+      detect_r_peaks(ADCProcessedBufState);
+      find_min_max();
+     	LCD_ShowFloatNum1(FIRST_LINE_X+40, FIRST_LINE_Y, max_val/4095.0*3.3, 3, RED, WHITE, 16);
+		  LCD_ShowFloatNum1(FIRST_LINE_X+120, FIRST_LINE_Y, min_val/4095.0*3.3, 3, RED, WHITE, 16);
       //RenderChart();
 			//HAL_Delay(1000);
 		}
@@ -259,6 +301,9 @@ void DrawLineArray(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2,uint16_t colo
 		}
 	}
 }
+
+#define CHART_X_START 45
+#define CHART_Y_START 45
 int pos=0;
 int posC=0;
 int freshNum=0;
@@ -269,12 +314,12 @@ void RenderChart(){
     }
 		for (int i = 0; i < 5; i++)
 		{
-      DrawLineArray(i*2,(int)(((ProcessedBuf[(i+pos)%564])*180.0f/4096.0f)),i*2+2,(int)(((ProcessedBuf[(i+pos+1)%564])*180.0f/4096.0f)),BLUE,(uint16_t *)DrawBuff,11);
+      DrawLineArray(i*2,180-(int)(((ProcessedBuf[(i+pos)%564])*180.0f/4095.0f)),i*2+2,180-(int)(((ProcessedBuf[(i+pos+1)%564])*180.0f/4096.0f)),BLUE,(uint16_t *)DrawBuff,11);
 		}
 		if(posC+10>=180){
 			posC=0;
 		}
-		LCD_FillArray(40+posC,50,40+posC+10,229, (uint8_t*)DrawBuff);
+		LCD_FillArray(CHART_X_START+posC,CHART_Y_START,CHART_X_START+posC+11-1,CHART_Y_START+180-1, (uint8_t*)DrawBuff);
 		pos+=5;
 		posC+=10;
 
@@ -404,45 +449,48 @@ uint8_t get_prev_buf_idx(uint8_t current_idx) {
 uint8_t get_next_buf_idx(uint8_t current_idx) {
     return (current_idx + 1) % 3;
 }
-// 修改后的R波检测函数，考虑ProcessedBuf的三个缓冲区
 void detect_r_peaks(uint16_t current_buf_idx) {
     uint16_t* buffer1 = &ProcessedBuf[188 * get_prev_buf_idx(current_buf_idx)];
     uint16_t* buffer2 = &ProcessedBuf[188 * current_buf_idx];
     uint16_t* buffer3 = &ProcessedBuf[188 * get_next_buf_idx(current_buf_idx)];
-    uint16_t* current_buffer;
     static uint16_t samples_since_last_r = 0;
     
-    for(uint16_t i = 1; i < 563; i++) {  // 避免边界�?�?
+    for(uint16_t i = 1; i < 563; i++) {
         samples_since_last_r++;
-        if(i<188){
-            current_buffer = buffer1;
-        }else if(i<376){
-            current_buffer = buffer2;
-        }else{
-            current_buffer = buffer3;
+        
+        // 获取当前点和相邻点的值
+        uint16_t current_value, prev_value, next_value;
+        
+        if(i < 188) {
+            current_value = buffer1[i];
+            prev_value = (i > 0) ? buffer1[i-1] : buffer1[0];
+            next_value = (i < 187) ? buffer1[i+1] : buffer2[0];
+        } else if(i < 376) {
+            current_value = buffer2[i-188];
+            prev_value = (i > 188) ? buffer2[i-189] : buffer1[187];
+            next_value = (i < 375) ? buffer2[i-187] : buffer3[0];
+        } else {
+            current_value = buffer3[i-376];
+            prev_value = (i > 376) ? buffer3[i-377] : buffer2[187];
+            next_value = (i < 562) ? buffer3[i-375] : buffer3[187];
         }
-        // R波检测条�?
-        if(current_buffer[i] > THRESHOLD && 
-           current_buffer[i] > current_buffer[i-1] && 
-           current_buffer[i] > current_buffer[i+1] && 
+        
+        // R波检测条件
+        if(current_value > THRESHOLD && 
+           current_value > prev_value && 
+           current_value > next_value && 
            samples_since_last_r > MIN_RR_SAMPLES) {
             
-            // 更新频率计算
-            
             update_frequency(samples_since_last_r);
-            
-            
             samples_since_last_r = 0;
             
-            // 发�?�R波标记和当前心率
             char msg[20];
-            int heart_rate = (int)(current_frequency * 60);  // 转换为BPM
+            int heart_rate = (int)(current_frequency * 60);
             sprintf(msg, "R:%d\r\n", heart_rate);
             HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 10);
         }
     }
 }
-
 
 
 
