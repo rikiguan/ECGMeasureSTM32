@@ -131,9 +131,9 @@ void draw_data(void)
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -191,16 +191,16 @@ int main(void)
   draw_data();
   //
 
-  /* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
-  /* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
   while (1)
   {
     if (ADCState == 2)
     {
-      uint8_t header[4] = {0x16, 0x80, 0x16, 0x80};
-      HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
-      HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564 * 2);
+      //uint8_t header[4] = {0x16, 0x80, 0x16, 0x80};
+      //HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
+      //HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564 * 2);
       ADCState = 0;
       detect_r_peaks(ADCProcessedBufState);
       find_min_max();
@@ -214,22 +214,22 @@ int main(void)
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-   */
+  */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
+  * in the RCC_OscInitTypeDef structure.
+  */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -244,15 +244,16 @@ void SystemClock_Config(void)
   }
 
   /** Activate the Over-Drive mode
-   */
+  */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -280,7 +281,7 @@ void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t 
   if (delta_x > 0)
     incx = 1; // 设置单步方向
   else if (delta_x == 0)
-    incx = 0; // 垂直�?
+    incx = 0; // 垂直�??
   else
   {
     incx = -1;
@@ -289,14 +290,14 @@ void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t 
   if (delta_y > 0)
     incy = 1;
   else if (delta_y == 0)
-    incy = 0; // 水平�?
+    incy = 0; // 水平�??
   else
   {
     incy = -1;
     delta_y = -delta_y;
   }
   if (delta_x > delta_y)
-    distance = delta_x; // 选取基本增量坐标�?
+    distance = delta_x; // 选取基本增量坐标�??
   else
     distance = delta_y;
   for (t = 0; t < distance + 1; t++)
@@ -356,21 +357,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
 }
 
-#define THRESHOLD 2000    // R波检测阈�?
-#define SAMPLING_RATE 500 // 采样�?(Hz)，根据您的实际采样率调整
 
 
 float current_frequency = 0.0f; // 当前频率(Hz)
 
 /* USER CODE BEGIN PV */
 
-#define MIN_SAMPLING_FREQ 250  // �?小采样频�? Hz
-#define MAX_SAMPLING_FREQ 1000 // �?大采样频�? Hz
-#define SAMPLES_PER_CYCLE 50   // 每个心跳周期期望的采样点�?
+#define MIN_SAMPLING_FREQ 50  // �??小采样频�?? Hz
+#define MAX_SAMPLING_FREQ 1000 // �??大采样频�?? Hz
+#define SAMPLES_PER_CYCLE 125   // 每个心跳周期期望的采样点�??
 
 // 添加采样频率调整相关变量
-uint32_t current_sampling_freq = 500; // 当前采样频率
-uint32_t target_sampling_freq = 500;  // 目标采样频率
+uint32_t current_sampling_freq = 125; // 当前采样频率
+uint32_t target_sampling_freq = 125;  // 目标采样频率
 
 // 调整TIM2和ADC采样频率
 void adjust_sampling_frequency(float signal_frequency)
@@ -390,8 +389,11 @@ void adjust_sampling_frequency(float signal_frequency)
   {
     target_sampling_freq = MAX_SAMPLING_FREQ;
   }
-
-  // 如果频率变化超过10%才更�?
+  // 发�?�采样频率更新信�??
+    char msg[32];
+    sprintf(msg, "TG:%d Hz\r\n", (int)target_sampling_freq);
+	HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
+  // 如果频率变化超过10%才更�??
   if (abs((int32_t)target_sampling_freq - (int32_t)current_sampling_freq) > (current_sampling_freq / 10))
   {
     // 计算TIM2的周期�??
@@ -399,23 +401,23 @@ void adjust_sampling_frequency(float signal_frequency)
     uint32_t timer_period = (45000000 / target_sampling_freq) - 1;
 
     // 停止定时器和ADC
-    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
-    HAL_ADC_Stop_DMA(&hadc1);
+//    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
+//   HAL_ADC_Stop_DMA(&hadc1);
 
-    // 更新TIM2配置
-    TIM2->ARR = timer_period;
-    TIM2->CCR2 = timer_period / 2; // 50% 占空�?
+//    // 更新TIM2配置
+   TIM2->ARR = timer_period;
+    TIM2->CCR2 = timer_period / 2; // 50% 占空�??
 
-    // 重启定时器和ADC
-    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADCBuf, 188);
+//    // 重启定时器和ADC
+//   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+//   HAL_ADC_Start_DMA(&hadc1, (uint32_t *)(ADCBuf + 10), 188);
 
-    current_sampling_freq = target_sampling_freq;
+   current_sampling_freq = target_sampling_freq;
 
-    // 发�?�采样频率更新信�?
+    // 发�?�采样频率更新信�??
     char msg[32];
     sprintf(msg, "SF:%d Hz\r\n", (int)current_sampling_freq);
-    HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
+		HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
   }
 }
 
@@ -460,7 +462,11 @@ uint16_t get_next_value(uint16_t *buffer1, uint16_t *buffer2, uint16_t *buffer3,
 }
 void detect_r_peaks(uint16_t current_buf_idx)
 {
-  uint16_t *buffer1 = &ProcessedBuf[188 * get_prev_buf_idx(current_buf_idx)];
+	current_buf_idx = (current_buf_idx+1)%3;
+
+	uint16_t trigCount = 0;
+	
+	uint16_t *buffer1 = &ProcessedBuf[188 * get_prev_buf_idx(current_buf_idx)];
   uint16_t *buffer2 = &ProcessedBuf[188 * current_buf_idx];
   uint16_t *buffer3 = &ProcessedBuf[188 * get_next_buf_idx(current_buf_idx)];
   static uint16_t samples_since_last_r = 0;
@@ -469,25 +475,35 @@ void detect_r_peaks(uint16_t current_buf_idx)
   {
     samples_since_last_r++;
 
-    // 获取当前点和相邻点的值
+    // 获取当前点和相邻点的�?
 
-    uint16_t current_value = get_current_value(buffer1, buffer2, buffer3, i);
+//    uint16_t current_value = get_current_value(buffer1, buffer2, buffer3, i);
+		uint16_t current_value = 1000;
     uint16_t prev_value = get_prev_value(buffer1, buffer2, buffer3, i);
     uint16_t next_value = get_next_value(buffer1, buffer2, buffer3, i);
 
+//			char msg[20];
+//      sprintf(msg, "%d\r\n", current_value);
+//      HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
 
-
-    if (current_value == THRESHOLD &&
+    if (
         current_value > get_prev_value(buffer1, buffer2, buffer3, i - 1) &&
         current_value > get_prev_value(buffer1, buffer2, buffer3, i - 2) &&
         current_value > get_prev_value(buffer1, buffer2, buffer3, i - 3) &&
         current_value < get_next_value(buffer1, buffer2, buffer3, i + 1) &&
         current_value < get_next_value(buffer1, buffer2, buffer3, i + 2) &&
-        current_value < get_next_value(buffer1, buffer2, buffer3, i + 3))
+        current_value < get_next_value(buffer1, buffer2, buffer3, i + 3) &&
+				samples_since_last_r > 5
+		)
     {
-      char msg[20];
-      sprintf(msg, "R:%d\r\n", samples_since_last_r);
-      HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
+			trigCount++;
+			if(trigCount>1){
+				char msg[20];
+				sprintf(msg, "R:%f\r\n", current_sampling_freq*1.0f/samples_since_last_r);
+				
+				HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
+				//adjust_sampling_frequency(125*1.0f/samples_since_last_r);
+			}
       samples_since_last_r = 0;
       
       int heart_rate = (int)(current_frequency * 60);
@@ -554,9 +570,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -565,14 +581,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
