@@ -4,6 +4,7 @@
 "lcddisplay_spi\lcd_init.o"
 "lcddisplay_spi\delay.o"
 "lcddisplay_spi\filter.o"
+"lcddisplay_spi\dataprocess.o"
 "lcddisplay_spi\main.o"
 "lcddisplay_spi\gpio.o"
 "lcddisplay_spi\adc.o"

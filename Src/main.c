@@ -127,7 +127,7 @@ void draw_data(void)
   // LCD_ShowFloatNum1(SECOND_LINE_X+60+28+28, SECOND_LINE_Y, 20.0, 3, RED, WHITE, 16);
   // LCD_ShowIntNum(SECOND_LINE_X+210, SECOND_LINE_Y, 21.2 * 60, 3, BLUE, WHITE, 16);
 }
-
+int jumpBuffer = 0;
 /* USER CODE END 0 */
 
 /**
@@ -202,7 +202,11 @@ int main(void)
       //HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
       //HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564 * 2);
       ADCState = 0;
+			if(jumpBuffer == 0){
       detect_r_peaks(ADCProcessedBufState);
+			}else{
+			jumpBuffer--;
+			}
       find_min_max();
       LCD_ShowFloatNum1(FIRST_LINE_X + 40, FIRST_LINE_Y, max_val / 4095.0 * 3.3, 3, RED, WHITE, 16);
       LCD_ShowFloatNum1(FIRST_LINE_X + 120, FIRST_LINE_Y, min_val / 4095.0 * 3.3, 3, RED, WHITE, 16);
@@ -363,9 +367,9 @@ float current_frequency = 0.0f; // 当前频率(Hz)
 
 /* USER CODE BEGIN PV */
 
-#define MIN_SAMPLING_FREQ 50  // �??小采样频�?? Hz
-#define MAX_SAMPLING_FREQ 1000 // �??大采样频�?? Hz
-#define SAMPLES_PER_CYCLE 125   // 每个心跳周期期望的采样点�??
+#define MIN_SAMPLING_FREQ 5  // �??小采样频�?? Hz
+#define MAX_SAMPLING_FREQ 10000 // �??大采样频�?? Hz
+#define SAMPLES_PER_CYCLE 50   // 每个心跳周期期望的采样点�??
 
 // 添加采样频率调整相关变量
 uint32_t current_sampling_freq = 125; // 当前采样频率
@@ -398,7 +402,7 @@ void adjust_sampling_frequency(float signal_frequency)
   {
     // 计算TIM2的周期�??
     // APB1 Timer Clock = 180MHz/4 = 45MHz
-    uint32_t timer_period = (45000000 / target_sampling_freq) - 1;
+    uint32_t timer_period = (90000000 / target_sampling_freq) - 1;
 
     // 停止定时器和ADC
 //    HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
@@ -460,6 +464,10 @@ uint16_t get_next_value(uint16_t *buffer1, uint16_t *buffer2, uint16_t *buffer3,
         return (i < 562) ? buffer3[i - 375] : buffer3[187];
     }
 }
+#define WINDOW_SIZE_MAIN 10
+volatile float captureValues11[WINDOW_SIZE_MAIN];
+uint8_t captureIndex11 = 0;
+float feq;
 void detect_r_peaks(uint16_t current_buf_idx)
 {
 	current_buf_idx = (current_buf_idx+1)%3;
@@ -478,7 +486,7 @@ void detect_r_peaks(uint16_t current_buf_idx)
     // 获取当前点和相邻点的�?
 
 //    uint16_t current_value = get_current_value(buffer1, buffer2, buffer3, i);
-		uint16_t current_value = 1000;
+		uint16_t current_value = 2000;
     uint16_t prev_value = get_prev_value(buffer1, buffer2, buffer3, i);
     uint16_t next_value = get_next_value(buffer1, buffer2, buffer3, i);
 
@@ -499,17 +507,28 @@ void detect_r_peaks(uint16_t current_buf_idx)
 			trigCount++;
 			if(trigCount>1){
 				char msg[20];
-				sprintf(msg, "R:%f\r\n", current_sampling_freq*1.0f/samples_since_last_r);
-				
+				sprintf(msg, "R:%f\r\n",feq);
+				avgFilter_FLOAT(current_sampling_freq*1.0f/samples_since_last_r, (float *)captureValues11,&captureIndex11, (float *)&(feq), WINDOW_SIZE_MAIN);
+
 				HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
-				//adjust_sampling_frequency(125*1.0f/samples_since_last_r);
-			}
+				
+			
       samples_since_last_r = 0;
       
       int heart_rate = (int)(current_frequency * 60);
       
     }
   }
+		
+}
+	
+if(trigCount>1){
+		adjust_sampling_frequency(feq);
+		jumpBuffer = 3;
+}
+if(trigCount==1){
+		adjust_sampling_frequency(feq-0.1);
+}
 }
 
 void draw_x_axis(int time)
