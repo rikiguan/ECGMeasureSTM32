@@ -62,7 +62,10 @@ uint16_t DATABuf[188] = {0};
 uint16_t ProcessedBuf[564] = {0};
 uint8_t ADCState = 0;             // 0 Default 1 HalfComplete 2 Complete
 uint8_t ADCProcessedBufState = 0; // 0  1  2
-
+#define Key_High HAL_GPIO_ReadPin(GPIOG,GPIO_PIN_7)==1//??????????????
+#define Key_Low HAL_GPIO_ReadPin(GPIOG,GPIO_PIN_7)==0
+#define ModeKey_High HAL_GPIO_ReadPin(GPIOG,GPIO_PIN_6)==1//??????????????
+#define ModeKey_Low HAL_GPIO_ReadPin(GPIOG,GPIO_PIN_6)==0
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -103,7 +106,7 @@ uint16_t DrawBuff[180][11];
 void RenderChart(void);
 void draw_x_axis(int time);
 void draw_y_axis(float Vmax);
-
+int heart_rate ;
 void draw_data(void)
 {
 #define FIRST_LINE_Y 3
@@ -120,14 +123,24 @@ void draw_data(void)
 
 #define SECOND_LINE_Y 20
 #define SECOND_LINE_X 45
-  LCD_ShowString(SECOND_LINE_X, SECOND_LINE_Y, "Freq:", BLUE, WHITE, 16, 0);
-  LCD_ShowIntNum(SECOND_LINE_X + 40, SECOND_LINE_Y, 21.2 * 60, 3, RED, WHITE, 16);
+  LCD_ShowString(SECOND_LINE_X, SECOND_LINE_Y, "HrtR:", BLUE, WHITE, 16, 0);
+  LCD_ShowIntNum(SECOND_LINE_X + 40, SECOND_LINE_Y, heart_rate, 3, RED, WHITE, 16);
   // LCD_ShowString(SECOND_LINE_X+60+28, SECOND_LINE_Y, "OK", BLUE, BLACK, 16, 0);
   // LCD_ShowString(FIRST_LINE_X+160, SECOND_LINE_Y, "Poss:", BLUE, WHITE, 16, 0);
   // LCD_ShowFloatNum1(SECOND_LINE_X+60+28+28, SECOND_LINE_Y, 20.0, 3, RED, WHITE, 16);
   // LCD_ShowIntNum(SECOND_LINE_X+210, SECOND_LINE_Y, 21.2 * 60, 3, BLUE, WHITE, 16);
 }
 int jumpBuffer = 0;
+int Cursor=0;
+int freqSamp =0;
+#define MIN_SAMPLING_FREQ 5  // �??小采样频�?? Hz
+#define MAX_SAMPLING_FREQ 10000000 // �??大采样频�?? Hz
+#define SAMPLES_PER_CYCLE 50   // 每个心跳周期期望的采样点�??
+
+// 添加采样频率调整相关变量
+uint32_t current_sampling_freq = 125; // 当前采样频率
+uint32_t target_sampling_freq = 125;  // 目标采样频率
+
 /* USER CODE END 0 */
 
 /**
@@ -198,9 +211,9 @@ int main(void)
   {
     if (ADCState == 2)
     {
-      //uint8_t header[4] = {0x16, 0x80, 0x16, 0x80};
-      //HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
-      //HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564 * 2);
+      uint8_t header[4] = {0x16, 0x80, 0x16, 0x80};
+      HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
+      HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564 * 2);
       ADCState = 0;
 			if(jumpBuffer == 0){
       detect_r_peaks(ADCProcessedBufState);
@@ -213,6 +226,35 @@ int main(void)
       // RenderChart();
       // HAL_Delay(1000);
     }
+		
+				if(Key_Low)
+		{
+			HAL_Delay  ( 10 );
+			if(Key_Low)
+			{
+				 HAL_Delay  ( 10 );
+			if(Key_Low)
+				Cursor=(Cursor+5)%180;
+			do
+			{
+				while(Key_Low);
+				HAL_Delay( 10 );
+			}while(Key_Low);
+		}
+		};//??????,???????
+		
+			if(ModeKey_Low)
+		{
+			HAL_Delay  ( 10 );
+			if(ModeKey_Low)
+				freqSamp=(freqSamp+1);
+				target_sampling_freq=(target_sampling_freq+100);
+			do
+			{
+				while(ModeKey_Low);
+				HAL_Delay( 10 );
+			}while(ModeKey_Low);
+		}
   }
   /* USER CODE END 3 */
 }
@@ -330,6 +372,11 @@ int freshNum = 0;
 void RenderChart()
 {
   memset(DrawBuff, 0, 180 * 11 * 2);
+
+
+    // Draw vertical grid lines (every 20 pixels for example)
+   
+
   for (int j = 0; j < 180; j++)
   {
     DrawBuff[j][10] = WHITE;
@@ -342,9 +389,23 @@ void RenderChart()
   {
     posC = 0;
   }
+	        for (int y = 0; y < 180; y+=20) {
+					for(int x = 0;x <10;x++){
+						if((CHART_X_START + posC+x)%10<5){
+							DrawBuff[y][x] = RED;
+						}
+					}
+        }
+					for(int x = 0;x <10;x++){
+						
+							DrawBuff[Cursor][x] = GREEN;
+						
+					}
+					
   LCD_FillArray(CHART_X_START + posC, CHART_Y_START, CHART_X_START + posC + 11 - 1, CHART_Y_START + 180 - 1, (uint8_t *)DrawBuff);
   pos += 5;
   posC += 10;
+				LCD_ShowIntNum(SECOND_LINE_X + 40, SECOND_LINE_Y, heart_rate, 6, RED, WHITE, 16);
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
@@ -363,27 +424,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 
 
-float current_frequency = 0.0f; // 当前频率(Hz)
+//float current_frequency = 0.0f; // 当前频率(Hz)
 
 /* USER CODE BEGIN PV */
 
-#define MIN_SAMPLING_FREQ 5  // �??小采样频�?? Hz
-#define MAX_SAMPLING_FREQ 10000 // �??大采样频�?? Hz
-#define SAMPLES_PER_CYCLE 50   // 每个心跳周期期望的采样点�??
-
-// 添加采样频率调整相关变量
-uint32_t current_sampling_freq = 125; // 当前采样频率
-uint32_t target_sampling_freq = 125;  // 目标采样频率
 
 // 调整TIM2和ADC采样频率
 void adjust_sampling_frequency(float signal_frequency)
 {
   if (signal_frequency <= 0)
     return;
-
+if(freqSamp == 0){
   // 计算目标采样频率：确保每个周期有足够的采样点
   target_sampling_freq = (uint32_t)(signal_frequency * SAMPLES_PER_CYCLE);
-
+}
   // 限制采样频率范围
   if (target_sampling_freq < MIN_SAMPLING_FREQ)
   {
@@ -419,9 +473,9 @@ void adjust_sampling_frequency(float signal_frequency)
    current_sampling_freq = target_sampling_freq;
 
     // 发�?�采样频率更新信�??
-    char msg[32];
-    sprintf(msg, "SF:%d Hz\r\n", (int)current_sampling_freq);
-		HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
+//    char msg[32];
+//    sprintf(msg, "SF:%d Hz\r\n", (int)current_sampling_freq);
+//		HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
   }
 }
 
@@ -506,16 +560,16 @@ void detect_r_peaks(uint16_t current_buf_idx)
     {
 			trigCount++;
 			if(trigCount>1){
-				char msg[20];
-				sprintf(msg, "R:%f\r\n",feq);
+//				char msg[20];
+//				sprintf(msg, "R:%f %d\r\n",feq,heart_rate);
 				avgFilter_FLOAT(current_sampling_freq*1.0f/samples_since_last_r, (float *)captureValues11,&captureIndex11, (float *)&(feq), WINDOW_SIZE_MAIN);
 
-				HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
+//				HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
 				
 			
       samples_since_last_r = 0;
       
-      int heart_rate = (int)(current_frequency * 60);
+      heart_rate = (int)(feq * 60);
       
     }
   }
