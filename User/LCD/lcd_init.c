@@ -6,9 +6,9 @@ SPI_HandleTypeDef *oled_spi = &hspi5;
 
 
 /******************************************************************************
-      º¯ÊýËµÃ÷£ºLCD´®ÐÐÊý¾ÝÐ´Èëº¯Êý
-      Èë¿ÚÊý¾Ý£ºdat  ÒªÐ´ÈëµÄ´®ÐÐÊý¾Ý
-      ·µ»ØÖµ£º  ÎÞ
+      å‡½æ•°è¯´æ˜Žï¼šLCDä¸²è¡Œæ•°æ®å†™å…¥å‡½æ•°
+      å…¥å£æ•°æ®ï¼šdat  è¦å†™å…¥çš„ä¸²è¡Œæ•°æ®
+      è¿”å›žå€¼ï¼š  æ— 
 ******************************************************************************/
 void LCD_Writ_Bus(uint8_t dat) 
 {
@@ -16,9 +16,9 @@ void LCD_Writ_Bus(uint8_t dat)
 }
 
 /******************************************************************************
-      º¯ÊýËµÃ÷£ºLCDÐ´ÈëÊý¾Ý
-      Èë¿ÚÊý¾Ý£ºdat Ð´ÈëµÄÊý¾Ý
-      ·µ»ØÖµ£º  ÎÞ
+      å‡½æ•°è¯´æ˜Žï¼šLCDå†™å…¥æ•°æ®
+      å…¥å£æ•°æ®ï¼šdat å†™å…¥çš„æ•°æ®
+      è¿”å›žå€¼ï¼š  æ— 
 ******************************************************************************/
 void LCD_WR_DATA8(uint8_t dat)
 {
@@ -27,9 +27,9 @@ void LCD_WR_DATA8(uint8_t dat)
 
 
 /******************************************************************************
-      º¯ÊýËµÃ÷£ºLCDÐ´ÈëÊý¾Ý
-      Èë¿ÚÊý¾Ý£ºdat Ð´ÈëµÄÊý¾Ý
-      ·µ»ØÖµ£º  ÎÞ
+      å‡½æ•°è¯´æ˜Žï¼šLCDå†™å…¥æ•°æ®
+      å…¥å£æ•°æ®ï¼šdat å†™å…¥çš„æ•°æ®
+      è¿”å›žå€¼ï¼š  æ— 
 ******************************************************************************/
 void LCD_WR_DATA(uint16_t dat)
 {
@@ -39,78 +39,78 @@ void LCD_WR_DATA(uint16_t dat)
 
 
 /******************************************************************************
-      º¯ÊýËµÃ÷£ºLCDÐ´ÈëÃüÁî
-      Èë¿ÚÊý¾Ý£ºdat Ð´ÈëµÄÃüÁî
-      ·µ»ØÖµ£º  ÎÞ
+      å‡½æ•°è¯´æ˜Žï¼šLCDå†™å…¥å‘½ä»¤
+      å…¥å£æ•°æ®ï¼šdat å†™å…¥çš„å‘½ä»¤
+      è¿”å›žå€¼ï¼š  æ— 
 ******************************************************************************/
 void LCD_WR_REG(uint8_t dat)
 {
-	LCD_DC_Clr();//Ð´ÃüÁî
+	LCD_DC_Clr();//å†™å‘½ä»¤
 	LCD_Writ_Bus(dat);
-	LCD_DC_Set();//Ð´Êý¾Ý
+	LCD_DC_Set();//å†™æ•°æ®
 }
 
 
 /******************************************************************************
-      º¯ÊýËµÃ÷£ºÉèÖÃÆðÊ¼ºÍ½áÊøµØÖ·
-      Èë¿ÚÊý¾Ý£ºx1,x2 ÉèÖÃÁÐµÄÆðÊ¼ºÍ½áÊøµØÖ·
-                y1,y2 ÉèÖÃÐÐµÄÆðÊ¼ºÍ½áÊøµØÖ·
-      ·µ»ØÖµ£º  ÎÞ
+      å‡½æ•°è¯´æ˜Žï¼šè®¾ç½®èµ·å§‹å’Œç»“æŸåœ°å€
+      å…¥å£æ•°æ®ï¼šx1,x2 è®¾ç½®åˆ—çš„èµ·å§‹å’Œç»“æŸåœ°å€
+                y1,y2 è®¾ç½®è¡Œçš„èµ·å§‹å’Œç»“æŸåœ°å€
+      è¿”å›žå€¼ï¼š  æ— 
 ******************************************************************************/
 void LCD_Address_Set(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2)
 {
 	if(USE_HORIZONTAL==0)
 	{
-		LCD_WR_REG(0x2a);//ÁÐµØÖ·ÉèÖÃ
+		LCD_WR_REG(0x2a);//åˆ—åœ°å€è®¾ç½®
 		LCD_WR_DATA(x1);
 		LCD_WR_DATA(x2);
-		LCD_WR_REG(0x2b);//ÐÐµØÖ·ÉèÖÃ
+		LCD_WR_REG(0x2b);//è¡Œåœ°å€è®¾ç½®
 		LCD_WR_DATA(y1);
 		LCD_WR_DATA(y2);
-		LCD_WR_REG(0x2c);//´¢´æÆ÷Ð´
+		LCD_WR_REG(0x2c);//å‚¨å­˜å™¨å†™
 	}
 	else if(USE_HORIZONTAL==1)
 	{
-		LCD_WR_REG(0x2a);//ÁÐµØÖ·ÉèÖÃ
+		LCD_WR_REG(0x2a);//åˆ—åœ°å€è®¾ç½®
 		LCD_WR_DATA(x1);
 		LCD_WR_DATA(x2);
-		LCD_WR_REG(0x2b);//ÐÐµØÖ·ÉèÖÃ
+		LCD_WR_REG(0x2b);//è¡Œåœ°å€è®¾ç½®
 		LCD_WR_DATA(y1+80);
 		LCD_WR_DATA(y2+80);
-		LCD_WR_REG(0x2c);//´¢´æÆ÷Ð´
+		LCD_WR_REG(0x2c);//å‚¨å­˜å™¨å†™
 	}
 	else if(USE_HORIZONTAL==2)
 	{
-		LCD_WR_REG(0x2a);//ÁÐµØÖ·ÉèÖÃ
+		LCD_WR_REG(0x2a);//åˆ—åœ°å€è®¾ç½®
 		LCD_WR_DATA(x1);
 		LCD_WR_DATA(x2);
-		LCD_WR_REG(0x2b);//ÐÐµØÖ·ÉèÖÃ
+		LCD_WR_REG(0x2b);//è¡Œåœ°å€è®¾ç½®
 		LCD_WR_DATA(y1);
 		LCD_WR_DATA(y2);
-		LCD_WR_REG(0x2c);//´¢´æÆ÷Ð´
+		LCD_WR_REG(0x2c);//å‚¨å­˜å™¨å†™
 	}
 	else
 	{
-		LCD_WR_REG(0x2a);//ÁÐµØÖ·ÉèÖÃ
+		LCD_WR_REG(0x2a);//åˆ—åœ°å€è®¾ç½®
 		LCD_WR_DATA(x1+80);
 		LCD_WR_DATA(x2+80);
-		LCD_WR_REG(0x2b);//ÐÐµØÖ·ÉèÖÃ
+		LCD_WR_REG(0x2b);//è¡Œåœ°å€è®¾ç½®
 		LCD_WR_DATA(y1);
 		LCD_WR_DATA(y2);
-		LCD_WR_REG(0x2c);//´¢´æÆ÷Ð´
+		LCD_WR_REG(0x2c);//å‚¨å­˜å™¨å†™
 	}
 }
 
 void LCD_Init(void)
 {
-//	LCD_GPIO_Init();//³õÊ¼»¯GPIO
+//	LCD_GPIO_Init();//åˆå§‹åŒ–GPIO
 	
-	LCD_RES_Clr();//¸´Î»
+	LCD_RES_Clr();//å¤ä½
 	delay_ms(400);
 	LCD_RES_Set();
 	delay_ms(200);
 	
-	LCD_BLK_Set();//´ò¿ª±³¹â
+	LCD_BLK_Set();//æ‰“å¼€èƒŒå…‰
   delay_ms(100);
 	
 	//************* Start Initial Sequence **********//

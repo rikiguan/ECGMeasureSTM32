@@ -74,6 +74,7 @@ void avgFilterLazy(uint32_t input, uint32_t *window, uint8_t *count, uint32_t *r
         (*result) = totalDiff / windowSize;
     }
 }
+
 void avgFilter_FLOAT(float input, float *window, uint8_t *count, float *result, uint8_t windowSize)
 {
 

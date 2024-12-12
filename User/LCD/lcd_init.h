@@ -4,7 +4,7 @@
 #include "stdint.h"
 
 
-#define USE_HORIZONTAL 0  //ÉèÖÃºáÆÁ»òÕßÊúÆÁÏÔÊ¾ 0»ò1ÎªÊúÆÁ 2»ò3ÎªºáÆÁ
+#define USE_HORIZONTAL 0  //è®¾ç½®æ¨ªå±æˆ–è€…ç«–å±æ˜¾ç¤º 0æˆ–1ä¸ºç«–å± 2æˆ–3ä¸ºæ¨ªå±
 
 
 #define LCD_W 240
@@ -12,7 +12,7 @@
 
 
 
-//-----------------LCD¶Ë¿Ú¶¨Òå---------------- 
+//-----------------LCDç«¯å£å®šä¹‰---------------- 
 
 
 #define LCD_RES_Clr()  HAL_GPIO_WritePin(GPIOH,GPIO_PIN_13,GPIO_PIN_RESET)//RES
@@ -26,13 +26,13 @@
 
 
 
-void LCD_GPIO_Init(void);//³õÊ¼»¯GPIO
-void LCD_Writ_Bus(uint8_t dat);//Ä£ÄâSPIÊ±Ğò
-void LCD_WR_DATA8(uint8_t dat);//Ğ´ÈëÒ»¸ö×Ö½Ú
-void LCD_WR_DATA(uint16_t dat);//Ğ´ÈëÁ½¸ö×Ö½Ú
-void LCD_WR_REG(uint8_t dat);//Ğ´ÈëÒ»¸öÖ¸Áî
-void LCD_Address_Set(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2);//ÉèÖÃ×ø±êº¯Êı
-void LCD_Init(void);//LCD³õÊ¼»¯
+void LCD_GPIO_Init(void);//åˆå§‹åŒ–GPIO
+void LCD_Writ_Bus(uint8_t dat);//æ¨¡æ‹ŸSPIæ—¶åº
+void LCD_WR_DATA8(uint8_t dat);//å†™å…¥ä¸€ä¸ªå­—èŠ‚
+void LCD_WR_DATA(uint16_t dat);//å†™å…¥ä¸¤ä¸ªå­—èŠ‚
+void LCD_WR_REG(uint8_t dat);//å†™å…¥ä¸€ä¸ªæŒ‡ä»¤
+void LCD_Address_Set(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2);//è®¾ç½®åæ ‡å‡½æ•°
+void LCD_Init(void);//LCDåˆå§‹åŒ–
 #endif
 
 
