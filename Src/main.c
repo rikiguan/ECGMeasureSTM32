@@ -160,8 +160,8 @@ int main(void)
     if (ADCState == 2)
     {
 			uint8_t header[4] = {0x16, 0x80, 0x16, 0x80};
-			// HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
-      // HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564 * 2);
+			HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
+      HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564 * 2);
       ADCState = 0;
       if (jumpBuffer == 0)
       {
@@ -354,6 +354,10 @@ uint16_t DrawBuff1[Y_TOTAL][10];
 void RenderChart1()
 {
   int posS = pos;
+  char msg[64];
+  sprintf(msg, "POS%d\n\r", posS);
+  HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
+
   for (posC = 0; posC < X_TOTAL; posC += 10)
   {
     memset(DrawBuff1, BLACK, Y_TOTAL * 10 * 2);
@@ -366,9 +370,18 @@ void RenderChart1()
     {
       for (int x = 0; x < 10; x++)
       {
-        if ((CHART_X_START + posC + x) % 10 < 5)
+        if (( posC + x) % 10 < 5)
         {
           DrawBuff1[y][x] = RED;
+          if(posS+x - 188<5 && posS+x - 188>0){
+            DrawBuff1[y][x] = GREEN;
+          }
+          if(posS+x - 188*2<5 && posS+x - 188*2>0){
+            DrawBuff1[y][x] = BLUE;
+          }
+          if((posS+x)%564 <5 && (posS+x)%564 >0){
+            DrawBuff1[y][x] = YELLOW;
+          }
         }
       }
     }
@@ -550,6 +563,13 @@ void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
     HAL_UART_Transmit(&huart1, "DMA Half\n", 9, 10);
 }
 uint8_t initFlag =0;
+float float_int_mod(float a, int b) {
+    float res = a - b * ((int)(a / b));
+    if(res < 0) {
+        res += b;
+    }
+    return res;
+}
 // ADC Full 测满返回
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
@@ -571,11 +591,14 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
     {
       pos=pos -188*3;
       addition=(int)pos;
+      pos = float_int_mod(pos,564);
     }else if (ADCProcessedBufState == 1)
     {
+      pos = float_int_mod(pos,564);
       addition=(int)pos -188*2;
     }else if (ADCProcessedBufState == 0)
     {
+      pos = float_int_mod(pos,564);
       addition=(int)pos -188;
     }
     //打印addition
@@ -608,14 +631,14 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 
 void button_handler(void)
 {
-  int key_num = Read_Keys();
-  if (key_num)
-  {
-    if (key_num == 13)
-    {
-      // add code here
-      HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-    }
+  // int key_num = Read_Keys();
+  // if (key_num)
+  // {
+  //   if (key_num == 13)
+  //   {
+  //     // add code here
+  //     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+  //   }
     //		else if(key_num==14)
     //		{
     //
@@ -628,7 +651,7 @@ void button_handler(void)
     //		{
     //
     //		}
-  }
+  //}
 }
 
 /* USER CODE END 4 */
