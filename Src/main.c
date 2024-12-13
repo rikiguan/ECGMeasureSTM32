@@ -14,8 +14,8 @@
  * the "License"; You may not use this file except in compliance with the
  * License. You may obtain a copy of the License at:
  *                        opensource.org/licenses/BSD-3-Clause
- *target1:改操作界�???????(OK)
- *target2:摆脱滤波操作（也还好�???????
+ *target1:改操作界�????????(OK)
+ *target2:摆脱滤波操作（也还好�????????
  *target3:加入暂停与坐标轴功能（矩阵键盘）
  *target4:
  ******************************************************************************
@@ -63,11 +63,11 @@
 // some variable for adc
 uint16_t ADCBuf[198] = {0};
 uint16_t DATABuf[188] = {0};
-uint16_t ProcessedBuf[564] = {0}; // 3个存放数�???????
+uint16_t ProcessedBuf[564] = {0}; // 3个存放数�????????
 uint8_t ADCState = 0;             // 0 Default 1 HalfComplete 2 Complete
 uint8_t ADCProcessedBufState = 0; // 0  1  2
 
-// 两个功能�???????
+// 两个功能�????????
 #define Key_High HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_7) == 1 //
 #define Key_Low HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_7) == 0
 #define ModeKey_High HAL_GPIO_ReadPin(GPIOG, GPIO_PIN_6) == 1 //
@@ -89,9 +89,9 @@ int heart_rate;
 uint16_t DrawBuff[180][11];
 int jumpBuffer = 0;
 int Cursor = 0;
-#define MIN_SAMPLING_FREQ 5        // // �???????小采样频�??????? Hz
-#define MAX_SAMPLING_FREQ 10000000 // �???????大采样频�??????? Hz
-#define SAMPLES_PER_CYCLE 50       //  每个心跳周期期望的采样点�???????
+#define MIN_SAMPLING_FREQ 5        // // �????????小采样频�???????? Hz
+#define MAX_SAMPLING_FREQ 10000000 // �????????大采样频�???????? Hz
+#define SAMPLES_PER_CYCLE 50       //  每个心跳周期期望的采样点�????????
 
 // 函数声明
 void detect_r_peaks(uint16_t current_buf_idx);
@@ -302,7 +302,7 @@ void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t 
   if (delta_x > 0)
     incx = 1; // 设置单步方向
   else if (delta_x == 0)
-    incx = 0; // 垂直恒定�???????
+    incx = 0; // 垂直恒定�????????
   else
   {
     incx = -1;
@@ -311,7 +311,7 @@ void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t 
   if (delta_y > 0)
     incy = 1;
   else if (delta_y == 0)
-    incy = 0; // 水平恒定�???????
+    incy = 0; // 水平恒定�????????
   else
   {
     incy = -1;
@@ -345,6 +345,7 @@ void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t 
 #define Y_TOTAL 190
 #define X_TOTAL 230
 
+
 float pos = 0;
 int posC = 0;
 int freshNum = 0;
@@ -354,10 +355,6 @@ uint16_t DrawBuff1[Y_TOTAL][10];
 void RenderChart1()
 {
   int posS = pos;
-  char msg[64];
-  sprintf(msg, "POS%d\n\r", posS);
-  HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 10);
-
   for (posC = 0; posC < X_TOTAL; posC += 10)
   {
     memset(DrawBuff1, BLACK, Y_TOTAL * 10 * 2);
@@ -402,7 +399,7 @@ int last_dma_tick = 0;
 float point_num_each_tick = 2;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  //系统刷屏�?
+  //系统刷屏�??
   if (htim->Instance == TIM6)
   {
     // 心电采集读取
@@ -419,7 +416,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 /* USER CODE BEGIN PV */
 
-// 获取循环idx的前后下�???????
+// 获取循环idx的前后下�????????
 uint8_t get_prev_buf_idx(uint8_t current_idx)
 {
   return (current_idx + 2) % 3;
@@ -479,7 +476,7 @@ uint16_t get_next_value(uint16_t *buffer1, uint16_t *buffer2, uint16_t *buffer3,
   }
 }
 
-// �???????测R�???????
+// �????????测R�????????
 #define WINDOW_SIZE_MAIN 3
 volatile float captureValues11[WINDOW_SIZE_MAIN];
 uint8_t captureIndex11 = 0;
@@ -488,11 +485,11 @@ void detect_r_peaks(uint16_t current_buf_idx)
 {
   current_buf_idx = (current_buf_idx + 1) % 3;
 
-  uint16_t trigCount = 0; // �???????测到的心电周期数
+  uint16_t trigCount = 0; // �????????测到的心电周期数
 
-  uint16_t *buffer1 = &ProcessedBuf[188 * get_prev_buf_idx(current_buf_idx)]; // 获取前一组开头地�???????
-  uint16_t *buffer2 = &ProcessedBuf[188 * current_buf_idx];                   // 获取当前组开头地�???????
-  uint16_t *buffer3 = &ProcessedBuf[188 * get_next_buf_idx(current_buf_idx)]; // 获取下一组开头地�???????
+  uint16_t *buffer1 = &ProcessedBuf[188 * get_prev_buf_idx(current_buf_idx)]; // 获取前一组开头地�????????
+  uint16_t *buffer2 = &ProcessedBuf[188 * current_buf_idx];                   // 获取当前组开头地�????????
+  uint16_t *buffer3 = &ProcessedBuf[188 * get_next_buf_idx(current_buf_idx)]; // 获取下一组开头地�????????
   static uint16_t samples_since_last_r = 0;
 
   for (uint16_t i = 0 + 3; i < 564 - 3; i++)
@@ -500,7 +497,7 @@ void detect_r_peaks(uint16_t current_buf_idx)
     samples_since_last_r++; // 用于记录自上次检测到R峰�?�以来的样本数�??
 
     // 获取当前点和相邻点的坐标
-    uint16_t current_value = 2000; // 随便设的中间�???????
+    uint16_t current_value = 2000; // 随便设的中间�????????
     uint16_t prev_value = get_prev_value(buffer1, buffer2, buffer3, i);
     uint16_t next_value = get_next_value(buffer1, buffer2, buffer3, i);
 
@@ -510,7 +507,7 @@ void detect_r_peaks(uint16_t current_buf_idx)
         samples_since_last_r > 5 // 至少5个点，找到一个R波上升沿
     )
     {
-      trigCount++; // �???????测到的心电周期数++
+      trigCount++; // �????????测到的心电周期数++
       if (trigCount > 1)
       {
         avgFilter_FLOAT(125 * 1.0f / samples_since_last_r, (float *)captureValues11, &captureIndex11, (float *)&(feq), WINDOW_SIZE_MAIN);
@@ -531,7 +528,7 @@ void draw_data(void)
   LCD_DrawLine(9, 24, 9, 215, BLACK);
   LCD_DrawLine(0, 215, 240, 215, BLACK);
   LCD_DrawLine(0, 24, 240, 24, BLACK);
-  for (int i = 0; i <= 3; i++) // �???????4个标记：0V�???????1V�???????2V�???????3V
+  for (int i = 0; i <= 3; i++) // �????????4个标记：0V�????????1V�????????2V�????????3V
   {
     LCD_DrawLine(7, 215 - 55 * i, 10, 215 - 55 * i, BLACK);
     LCD_ShowIntNum(0, 198 - 55 * i, i, 1, BLACK, WHITE, 16);
