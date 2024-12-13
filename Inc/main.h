@@ -1,22 +1,4 @@
 /* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -37,6 +19,23 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+extern uint16_t ADCBuf[198] ;
+extern uint16_t DATABuf[188] ;
+extern uint8_t ADCState ;             // 0 Default 1 HalfComplete 2 Complete
+extern uint8_t ADCProcessedBufState ; // 0  1  2
+extern uint16_t ProcessedBuf[564];
+extern int Cursor;
+extern int heart_rate;
+extern uint16_t max_val ;
+extern uint16_t min_val ;
+extern float feq ;
+
+extern int tick ;
+extern int last_dma_tick ;
+extern float point_num_each_tick ;
+extern float pos ;
+
+
 
 /* USER CODE END ET */
 
@@ -54,7 +53,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-uint16_t Get_ADC_Value(void);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

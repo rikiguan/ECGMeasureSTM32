@@ -14,7 +14,16 @@
 /build/
 # IDE settings folder
 /.vscode/
+/.ai/
 # Project configuration files
 *.uvproj
 *.uvopt
 *.uvoptx
+*.log
+*.lock
+*.hex
+*.htm
+*.uvprojx
+*.uvprojx.*
+*.uvguix.*
+*.lnp
