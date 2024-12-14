@@ -1,5 +1,6 @@
 #include "graphic.h"
 #include <string.h>
+#include "stdio.h"
 // 将波形转化为二维图表进行刷屏
 #define CHART_X_START 10
 #define CHART_Y_START 25
@@ -18,9 +19,9 @@ void RenderChart1()
         memset(DrawBuff1, BLACK, Y_TOTAL * 10 * 2);
 
         for (int i = 0; i < 5; i++)
-        {
-            DrawLineArray(i * 2, Y_TOTAL - (int)(((ProcessedBuf[(i + posS) % 564]) * Y_TOTAL / 4095.0f)) - 1, i * 2 + 2, Y_TOTAL - (int)(((ProcessedBuf[(i + posS + 1) % 564]) * Y_TOTAL / 4095.0f)) - 1, YELLOW, (uint16_t *)DrawBuff1, 10);
-        }
+        {//TODO 有bug，暂行解决方案(Y_TOTAL-10)
+            DrawLineArray(i * 2, Y_TOTAL-5 - (int)(((ProcessedBuf[(i + posS) % 564]) * (Y_TOTAL-10) / 4095.0f)) - 1, i * 2 + 2, Y_TOTAL-5 - (int)(((ProcessedBuf[(i + posS + 1) % 564]) * (Y_TOTAL-10) / 4095.0f)) - 1, YELLOW, (uint16_t *)DrawBuff1, 10);
+				}
         for (int y = Y_TOTAL - 1; y >= 0; y -= 20)
         {
             for (int x = 0; x < 10; x++)
@@ -56,6 +57,20 @@ void RenderChart1()
 
 void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color, uint16_t *array, uint16_t width)
 {
+
+    if(x1 >= width){
+        x1 = width-1;
+    }
+    if(x2 >= width){
+        x2 = width-1;
+    }
+    if(y1 >= Y_TOTAL){
+        y1 = Y_TOTAL-1;
+    }
+    if(y2 >= Y_TOTAL){
+        y2 = Y_TOTAL-1;
+    }
+
     uint16_t t;
     int xerr = 0, yerr = 0, delta_x, delta_y, distance;
     int incx, incy, uRow, uCol;
@@ -87,6 +102,7 @@ void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t 
         distance = delta_y;
     for (t = 0; t < distance + 1; t++)
     {
+			
         array[uCol * width + uRow] = color; //
         xerr += delta_x;
         yerr += delta_y;

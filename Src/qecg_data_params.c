@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    qecg_data_params.c
   * @author  AST Embedded Analytics Research Platform
-  * @date    2024-12-13T14:23:55+0800
+  * @date    2024-12-13T17:05:05+0800
   * @brief   AI Tool Automatic Code Generator for Embedded NN computing
   ******************************************************************************
   * Copyright (c) 2024 STMicroelectronics.

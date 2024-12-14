@@ -1,6 +1,6 @@
 ST Edge AI Core v1.0.0-19894
-Created date          : 2024-12-13 14:23:56
-Parameters            : generate --target stm32f4 --name qecg -m C:/Users/fangting/Downloads/qecg_model.onnx --compression medium --verbosity 1 --allocate-inputs -O time --allocate-outputs --workspace C:/Users/fangting/AppData/Local/Temp/mxAI_workspace23267925751730009948436585738265472 --output C:/Users/fangting/.stm32cubemx/qecg_output
+Created date          : 2024-12-13 17:05:06
+Parameters            : generate --target stm32f4 --name qecg -m C:/Users/fangting/Downloads/qecg_model.onnx --compression medium --verbosity 1 --allocate-inputs -O time --allocate-outputs --workspace C:/Users/fangting/AppData/Local/Temp/mxAI_workspace23364630180369009332970192673753151 --output C:/Users/fangting/.stm32cubemx/qecg_output
 
 Exec/report summary (generate)
 ----------------------------------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ compression        :   medium
 options            :   allocate-inputs, allocate-outputs                                                        
 optimization       :   time                                                                                     
 target/series      :   stm32f4                                                                                  
-workspace dir      :   C:\Users\fangting\AppData\Local\Temp\mxAI_workspace23267925751730009948436585738265472   
+workspace dir      :   C:\Users\fangting\AppData\Local\Temp\mxAI_workspace23364630180369009332970192673753151   
 output dir         :   C:\Users\fangting\.stm32cubemx\qecg_output                                               
 model_fmt          :   float                                                                                    
 model_name         :   qecg_model                                                                               
