@@ -19,7 +19,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-extern uint16_t ADCBuf[198] ;
+extern uint16_t ADCBuf[188+140] ;
 extern uint16_t DATABuf[188] ;
 extern uint8_t ADCState ;             // 0 Default 1 HalfComplete 2 Complete
 extern uint8_t ADCProcessedBufState ; // 0  1  2

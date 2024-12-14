@@ -4,7 +4,7 @@
 #include <string.h>
 #include "stdint.h"
 #include "firProcess.h"
-#define ADC_VALUE_NUM 200
+#define ADC_VALUE_NUM 300
 uint16_t temp_value[ADC_VALUE_NUM];
 uint16_t temp_value1[ADC_VALUE_NUM];
 float ftemp_value[ADC_VALUE_NUM];
@@ -14,32 +14,39 @@ void extract_values(uint16_t * input,uint16_t *output, int pre, int num) {
 }
 void convert_adc_to_ftemp(uint16_t *adc_value, float *ftemp_value, int size) {
     for (int i = 0; i < size; i++) {
-        ftemp_value[i] = (adc_value[i] / 4095.0) * 10.0;
+        ftemp_value[i] = (adc_value[i] / 4095.0f) * 10.0f;
     }
 }
 void convert_ftemp_to_filtered(float *ftemp_value, uint16_t *filteredValues, int size,int pre) {
-    for (int i = pre; i < size; i++) {
-        filteredValues[i] = (uint16_t)(ftemp_value[i] / 10.0 * 4095.0);
+    for (int i = 0; i < size; i++) {
+        filteredValues[i] = (uint16_t)(ftemp_value[pre+i] / 10.0f * 4095.0f);
     }
 }
 void Opt_ADC_Value(uint16_t* adc_value, uint16_t* filteredValues, uint8_t MedWindowSize, uint8_t AvgWindowSize,uint16_t num,uint16_t pre,uint16_t behind)
 {
     //1
-    // firProcess((int16_t *)adc_value, (int16_t *)temp_value1);
-    // medianFilter(temp_value1, temp_value, num+pre+behind, MedWindowSize,0,0);
+    // medianFilter(adc_value, temp_value, num+pre+behind, MedWindowSize,0,0);
     // avgFilterArray(temp_value, filteredValues, num, AvgWindowSize,pre,behind);
 
     //2
-    //firProcess((int16_t *)adc_value, (int16_t *)temp_value1);
-    //extract_values(temp_value1,filteredValues,pre,num);
+    // firProcessQ15((int16_t *)adc_value, (int16_t *)temp_value1,num+pre+behind);
+    // extract_values(temp_value1,filteredValues,pre,num);
     
     //3
     //extract_values(adc_value,filteredValues,pre,num);
 
     //4
+    // convert_adc_to_ftemp(adc_value, ftemp_value, num+pre+behind);
+    // firProcessFT(ftemp_value, ftemp_value1);
+    // convert_ftemp_to_filtered(ftemp_value1, filteredValues, num,70);
+
+    //5
     convert_adc_to_ftemp(adc_value, ftemp_value, num+pre+behind);
-    firProcessFT(ftemp_value, ftemp_value1);
-    convert_ftemp_to_filtered(ftemp_value1, filteredValues, num,pre);
+    firProcessFT(ftemp_value, ftemp_value1,num+pre+behind);
+    convert_ftemp_to_filtered(ftemp_value1, temp_value1, num+behind+pre-70,70);
+    medianFilter(temp_value1, temp_value, num+pre+behind-70, MedWindowSize,0,0);
+    avgFilterArray(temp_value, filteredValues, num, AvgWindowSize,pre-35,behind-35);
+
 }
 
 int compare(const void *a, const void *b)

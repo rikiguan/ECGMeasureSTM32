@@ -66,7 +66,7 @@ void SystemClock_Config(void);
 int Cursor = 0;
 int heart_rate;
 uint16_t ProcessedBuf[564] = {0};
-uint16_t ADCBuf[198] = {0};
+uint16_t ADCBuf[188+140] = {0};
 uint16_t DATABuf[188] = {0};
 uint8_t ADCState = 0;             // 0 Default 1 HalfComplete 2 Complete
 uint8_t ADCProcessedBufState = 0; // 0  1  2
@@ -123,7 +123,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   // HAL_UART_Transmit(&huart1, "hello", 5, 5);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)(ADCBuf + 10), 188);
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)(ADCBuf + 140), 188);
 
   // HAL_TIM_Base_Start_IT(&htim6);
   LCD_Init();

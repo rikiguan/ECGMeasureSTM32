@@ -3,6 +3,6 @@
 
 
 #include "stdint.h" 
-void firProcess(int16_t *fir_inputbuf, int16_t *fir_outputbuf);
-void firProcessFT(float *fir_inputbuf, float *fir_outputbuf);
+void firProcessQ15(int16_t *fir_inputbuf, int16_t *fir_outputbuf,uint32_t blockSize);
+void firProcessFT(float *fir_inputbuf, float *fir_outputbuf,uint32_t blockSize);
 #endif

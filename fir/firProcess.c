@@ -4,6 +4,8 @@
 #include "stdio.h" 
 
 #include <stdlib.h>
+
+//TODO Q15方式存在bug
 int BL = 98;
 int16_t B[99] = {
      -227,   -192,    116,    -57,     18,    -15,     61,   -142,    222,
@@ -20,11 +22,11 @@ int16_t B[99] = {
 };
 
 int16_t pState[500] = {0.0f}; // FIR滤波器状态变量暂存：数组的大小=BL+blocksize-1
-uint32_t blockSize = 104;             // 块处理大小，即ADC采样的数据个数
+
 
 arm_fir_instance_q15 *S; // FIR实例化结构体
 
-void firProcessQ15(int16_t *fir_inputbuf, int16_t *fir_outputbuf)
+void firProcessQ15(int16_t *fir_inputbuf, int16_t *fir_outputbuf,uint32_t blockSize)
 {
 
   S = (arm_fir_instance_q15 *)malloc(sizeof(arm_fir_instance_q15)); // 开辟一个空间S
@@ -65,9 +67,8 @@ float FB[99] = {
   -0.001735856407, 0.003539241618,-0.005854468793,-0.006920771673
 };
 float fpState[500] = {0.0f}; // FIR滤波器状态变量暂存：数组的大小=BL+blocksize-1
-uint32_t fblockSize = 104; 
 arm_fir_instance_f32 *FS; // FIR实例化结构体
-void firProcessFT(float *fir_inputbuf, float *fir_outputbuf)
+void firProcessFT(float *fir_inputbuf, float *fir_outputbuf,uint32_t blockSize)
 {
 
   FS = (arm_fir_instance_f32 *)malloc(sizeof(arm_fir_instance_f32)); // 开辟一个空间S
@@ -76,8 +77,8 @@ void firProcessFT(float *fir_inputbuf, float *fir_outputbuf)
     printf("error\r\n");
   }
 
-  arm_fir_init_f32(FS, FBL, FB, fpState, fblockSize);
-  arm_fir_f32(FS, fir_inputbuf, fir_outputbuf, fblockSize);
+  arm_fir_init_f32(FS, FBL, FB, fpState, blockSize);
+  arm_fir_f32(FS, fir_inputbuf, fir_outputbuf, blockSize);
 
   free(FS);  // 释放内存
   FS = NULL; // 将指针设置为 NULL，以避免悬挂指针
