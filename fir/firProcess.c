@@ -72,7 +72,7 @@ void firProcessFT(float *fir_inputbuf, float *fir_outputbuf,uint32_t blockSize)
 {
 
   FS = (arm_fir_instance_f32 *)malloc(sizeof(arm_fir_instance_f32)); // 开辟一个空间S
-  if (S == NULL)                                                    // 如果开辟失败则报错
+  if (FS == NULL)                                                    // 如果开辟失败则报错
   {
     printf("error\r\n");
   }

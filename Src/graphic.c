@@ -52,7 +52,7 @@ void RenderChart1()
         LCD_FillArray(CHART_X_START + posC, CHART_Y_START, CHART_X_START + posC + 10 - 1, CHART_Y_START + Y_TOTAL - 1, (uint8_t *)DrawBuff1);
         posS += 5;
     }
-    LCD_ShowIntNum(210, 0, heart_rate, 3, RED, WHITE, 16);
+    draw_data();
 }
 
 void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color, uint16_t *array, uint16_t width)
@@ -119,7 +119,7 @@ void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t 
     }
 }
 
-void draw_data(void)
+void draw_ui(void)
 {
     LCD_ShowString(80, 220, "Vmax:", BLUE, WHITE, 16, 0);
     LCD_ShowString(160, 220, "Vmin:", BLUE, WHITE, 16, 0);
@@ -134,4 +134,41 @@ void draw_data(void)
         LCD_ShowIntNum(0, 198 - 55 * i, i, 1, BLACK, WHITE, 16);
     }
     LCD_ShowString(0, 0, "V", BLUE, WHITE, 16, 0);
+}
+
+
+void draw_data(){
+    LCD_ShowIntNum(210, 0, heart_rate, 3, RED, WHITE, 16);
+    LCD_ShowFloatNum1(120, 220, max_val / 4095.0 * 3.3, 3, RED, WHITE, 16);
+    LCD_ShowFloatNum1(200, 220, min_val / 4095.0 * 3.3, 3, RED, WHITE, 16);
+    LCD_ShowFloatNum1(40, 220, feq, 3, RED, WHITE, 16);
+    displayAIResults();
+}
+void displayAIResults() {
+    char *classStr;
+    switch (aiClass) {
+        case 0:
+            classStr = "Normal           ";
+            break;
+        case 1:
+            classStr = "Supraventricular";
+            break;
+        case 2:
+            classStr = "Ventricular      ";
+            break;
+        case 3:
+            classStr = "Fusion beat      ";
+            break;
+        case 4:
+            classStr = "Unclassifiable   ";
+            break;
+        default:
+            classStr = "Unknown          ";
+            break;
+    }
+
+    char displayStr[50];
+    // LCD_ShowString(0, 0, "                 ", BLUE, WHITE, 16, 0);
+    snprintf(displayStr, sizeof(displayStr), "%s", classStr);
+    LCD_ShowString(0, 0, (const uint8_t *)displayStr, BLUE, WHITE, 16, 0);
 }

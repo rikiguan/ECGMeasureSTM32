@@ -75,3 +75,17 @@ void convert_processed_buf(uint16_t maxval)
         ConvertedBuf[i] = ((float)ProcessedBuf[i] / (float)maxval);
     }
 }
+void updateAIResults(float* out_data, int length) {
+    float max_possibility = out_data[0];
+    int max_index = 0;
+
+    for (int i = 1; i < length; i++) {
+        if (out_data[i] > max_possibility) {
+            max_possibility = out_data[i];
+            max_index = i;
+        }
+    }
+
+    aiClass = max_index;
+    AI_possibility = max_possibility;
+}

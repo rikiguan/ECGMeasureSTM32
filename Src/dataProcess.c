@@ -116,7 +116,7 @@ void detect_r_peaks(uint16_t current_buf_idx)
             {
                 avgFilter_FLOAT(125 * 1.0f / samples_since_last_r, (float *)captureValues11, &captureIndex11, (float *)&(feq), WINDOW_SIZE_MAIN);
                 samples_since_last_r = 0;
-                LCD_ShowFloatNum1(40, 220, feq, 3, RED, WHITE, 16);
+                
                 heart_rate = (int)(feq * 60);
             }
         }

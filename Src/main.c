@@ -62,7 +62,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int aiClass =-1;
+float AI_possibility = 0;
 int Cursor = 0;
 int heart_rate;
 uint16_t ProcessedBuf[564] = {0};
@@ -119,16 +120,17 @@ int main(void)
   MX_TIM2_Init();
   MX_USART1_UART_Init();
   MX_TIM6_Init();
-  //MX_TIM7_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   // HAL_UART_Transmit(&huart1, "hello", 5, 5);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t *)(ADCBuf + 140), 188);
 
-  // HAL_TIM_Base_Start_IT(&htim6);
+
   LCD_Init();
   LCD_Fill(0, 0, LCD_W, LCD_H, WHITE);
   HAL_TIM_Base_Start_IT(&htim6);
+  HAL_TIM_Base_Start_IT(&htim7);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -139,7 +141,7 @@ int main(void)
     return -1;
   }
 
-  draw_data();
+  draw_ui();
 
     /* USER CODE END WHILE */
 
@@ -148,6 +150,8 @@ int main(void)
   {
     if (ADCState == 2)
     {
+      // uint8_t header1[8] = {0x16, 0x90, 0x16, 0x90,0x00,0x10,0x00,0x00};
+      // HAL_UART_Transmit(&huart1, (uint8_t *)header1, 8, 1);
       uint8_t header[4] = {0x16, 0x80, 0x16, 0x80};
       HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
       HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564 * 2);
@@ -161,20 +165,7 @@ int main(void)
         jumpBuffer--;
       }
       find_min_max();
-      LCD_ShowFloatNum1(120, 220, max_val / 4095.0 * 3.3, 3, RED, WHITE, 16);
-      LCD_ShowFloatNum1(200, 220, min_val / 4095.0 * 3.3, 3, RED, WHITE, 16);
-      printf("begin");
-      convert_processed_buf(max_val);
-      if (ai_run(in_data, out_data, ConvertedBuf, AI_QECG_IN_1_SIZE) != 0)
-      {
-        return -1;
-      }
-
-      for (int i = 0; i < AI_QECG_OUT_1_SIZE; i++)
-      {
-        printf("%.2f,  ", out_data[i]);
-      }
-      printf("end\n");
+      
     }
 
     

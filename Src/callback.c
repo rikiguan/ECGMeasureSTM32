@@ -3,6 +3,7 @@
 #include "utils.h"
 #include <string.h>
 #include "filter.h"
+#include "ai.h"
 
 uint8_t freshNum = 0;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
@@ -17,6 +18,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
             RenderChart1();
         }
         tick++;
+    }
+    if (htim->Instance == TIM7)
+    {
+        //printf("begin");
+        convert_processed_buf(max_val);
+        if (ai_run(in_data, out_data, ConvertedBuf, AI_QECG_IN_1_SIZE) != 0)
+        {
+            return ;
+        }
+        updateAIResults(out_data, AI_QECG_OUT_1_SIZE);
+        // for (int i = 0; i < AI_QECG_OUT_1_SIZE; i++)
+        // {
+        //     //printf("%.2f,  ", out_data[i]);
+        // }
+        //printf("end\n");
     }
 }
 

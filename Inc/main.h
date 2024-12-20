@@ -35,7 +35,8 @@ extern int last_dma_tick ;
 extern float point_num_each_tick ;
 extern float pos ;
 
-
+extern int aiClass;
+extern float AI_possibility;
 
 /* USER CODE END ET */
 

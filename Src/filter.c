@@ -40,12 +40,19 @@ void Opt_ADC_Value(uint16_t* adc_value, uint16_t* filteredValues, uint8_t MedWin
     // firProcessFT(ftemp_value, ftemp_value1);
     // convert_ftemp_to_filtered(ftemp_value1, filteredValues, num,70);
 
-    //5
+    // //5
+    // convert_adc_to_ftemp(adc_value, ftemp_value, num+pre+behind);
+    // firProcessFT(ftemp_value, ftemp_value1,num+pre+behind);
+    // convert_ftemp_to_filtered(ftemp_value1, temp_value1, num+behind+pre-70,70);
+    // medianFilter(temp_value1, temp_value, num+pre+behind-70, MedWindowSize,0,0);
+    // avgFilterArray(temp_value, filteredValues, num, AvgWindowSize,pre-35,behind-35);
+
+    //6 with 10 pre&behind 
     convert_adc_to_ftemp(adc_value, ftemp_value, num+pre+behind);
     firProcessFT(ftemp_value, ftemp_value1,num+pre+behind);
-    convert_ftemp_to_filtered(ftemp_value1, temp_value1, num+behind+pre-70,70);
-    medianFilter(temp_value1, temp_value, num+pre+behind-70, MedWindowSize,0,0);
-    avgFilterArray(temp_value, filteredValues, num, AvgWindowSize,pre-35,behind-35);
+    convert_ftemp_to_filtered(ftemp_value1, temp_value1, num+10,130);
+    medianFilter(temp_value1, temp_value, num+10, MedWindowSize,0,0);
+    avgFilterArray(temp_value, filteredValues, num, AvgWindowSize,5,5);
 
 }
 

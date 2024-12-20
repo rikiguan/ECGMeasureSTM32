@@ -9,5 +9,7 @@
 
 void RenderChart1(void);
 void DrawLineArray(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color, uint16_t *array, uint16_t width);
+void draw_ui(void);
+void displayAIResults(void);
 void draw_data(void);
 #endif
