@@ -21,22 +21,22 @@ int ai_init()
     err = ai_qecg_create_and_init(&network, acts, NULL);
     if (err.type != AI_ERROR_NONE)
     {
-        printf("ai init_and_create error\n");
+        //printf("ai init_and_create error\n");
         return -1;
     }
     else
     {
-        printf("ai init success\n");
+        //printf("ai init success\n");
     }
 
     if (ai_qecg_get_report(network, &report) != true)
     {
-        printf("ai get report error\n");
+        //printf("ai get report error\n");
         return -1;
     }
 
-    printf("Model name      : %s\n", report.model_name);
-    printf("Model signature : %s\n", report.model_signature);
+    //printf("Model name      : %s\n", report.model_name);
+    //printf("Model signature : %s\n", report.model_signature);
     return 0;
 }
 
@@ -58,7 +58,7 @@ int ai_run(ai_float *in_data, ai_float *out_data, float *data, int length)
     if (n_batch != 1)
     {
         ai_qecg_get_error(network);
-        printf("run failed\r\n");
+        //printf("run failed\r\n");
         return -1;
     };
 

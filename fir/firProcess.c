@@ -32,7 +32,7 @@ void firProcessQ15(int16_t *fir_inputbuf, int16_t *fir_outputbuf,uint32_t blockS
   S = (arm_fir_instance_q15 *)malloc(sizeof(arm_fir_instance_q15)); // 开辟一个空间S
   if (S == NULL)                                                    // 如果开辟失败则报错
   {
-    printf("error\r\n");
+    // printf("error\r\n");
   }
 
   arm_fir_init_q15(S, BL, B, pState, blockSize);
@@ -74,7 +74,7 @@ void firProcessFT(float *fir_inputbuf, float *fir_outputbuf,uint32_t blockSize)
   FS = (arm_fir_instance_f32 *)malloc(sizeof(arm_fir_instance_f32)); // 开辟一个空间S
   if (FS == NULL)                                                    // 如果开辟失败则报错
   {
-    printf("error\r\n");
+    // printf("error\r\n");
   }
 
   arm_fir_init_f32(FS, FBL, FB, fpState, blockSize);
