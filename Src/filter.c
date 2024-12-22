@@ -31,7 +31,7 @@ void overSamplingAvg(uint16_t *input, uint16_t *output, int trueLength, int wind
         for (int w = 0; w < windowSize; w++) {
             avgFilterLazy((uint32_t)input[i*windowSize + w], window, &count, &result, windowSize);
         }
-        output[i] = input[i*windowSize ];
+        output[i] = (uint16_t)result;
     }
     free(window);
 }
