@@ -9,4 +9,5 @@ void avgFilterLazy(uint32_t input, uint32_t *window, uint8_t *count, uint32_t *r
 void avgFilterArray(uint16_t *input, uint16_t *output, int length, int windowSize,uint16_t pre,uint16_t behind);
 void avgFilterLazy_FLOAT(float input, float *window, uint8_t *count, float *result, uint8_t windowSize);
 void avgFilter_FLOAT(float input, float *window, uint8_t *count, float *result, uint8_t windowSize);
+void overSamplingAvg(uint16_t *input, uint16_t *output, int trueLength, int windowSize);
 #endif

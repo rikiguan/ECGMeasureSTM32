@@ -66,7 +66,7 @@ int Cursor = 0;
 int heart_rate;
 uint16_t ProcessedBuf[564] = {0};
 uint16_t ADCBuf[188 + 140] = {0};
-uint16_t DATABuf[188] = {0};
+uint16_t DATABuf[188*4] = {0};
 uint8_t ADCState = 0;             // 0 Default 1 HalfComplete 2 Complete
 uint8_t ADCProcessedBufState = 0; // 0  1  2
 uint16_t max_val = 0;
@@ -166,8 +166,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
   // HAL_UART_Transmit(&huart1, "hello", 5, 5);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)(ADCBuf + 140), 188);
-  Inithuawei();
+  // HAL_ADC_Start_DMA(&hadc1, (uint32_t *)(ADCBuf + 140), 188);
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)(DATABuf), 188*4);
+  // Inithuawei();
 
   LCD_Init();
   LCD_Fill(0, 0, LCD_W, LCD_H, WHITE);
@@ -195,9 +196,9 @@ int main(void)
     {
       // uint8_t header1[8] = {0x16, 0x90, 0x16, 0x90,0x00,0x10,0x00,0x00};
       // HAL_UART_Transmit(&huart1, (uint8_t *)header1, 8, 1);
-      // uint8_t header[4] = {0x16, 0x80, 0x16, 0x80};
-      // HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
-      // HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ProcessedBuf, 564 * 2);
+      uint8_t header[4] = {0x16, 0x80, 0x16, 0x80};
+      HAL_UART_Transmit(&huart1, (uint8_t *)header, 4, 1);
+      HAL_UART_Transmit_DMA(&huart1, (uint8_t *)ADCBuf, 564 * 2);
       ADCState = 0;
       if (jumpBuffer == 0)
       {
@@ -213,8 +214,8 @@ int main(void)
         heartratelength = 78;
       else
         heartratelength = 79;
-        printf("AT+HMPUB=1,\"$oc/devices/67526b6cef99673c8ad2f66e_ecgtest/sys/properties/report\",%d,\"{\\\"services\\\":[{\\\"service_id\\\":\\\"HeartRateMonitor\\\",\\\"properties\\\":{\\\"HeartRate\\\":%d}}]}\"\r\n", heartratelength,heart_rate );
-        voice(heart_rate);  
+        // printf("AT+HMPUB=1,\"$oc/devices/67526b6cef99673c8ad2f66e_ecgtest/sys/properties/report\",%d,\"{\\\"services\\\":[{\\\"service_id\\\":\\\"HeartRateMonitor\\\",\\\"properties\\\":{\\\"HeartRate\\\":%d}}]}\"\r\n", heartratelength,heart_rate );
+        // voice(heart_rate);  
     }
 
     button_handler();

@@ -22,6 +22,20 @@ void convert_ftemp_to_filtered(float *ftemp_value, uint16_t *filteredValues, int
         filteredValues[i] = (uint16_t)(ftemp_value[pre+i] / 10.0f * 4095.0f);
     }
 }
+
+void overSamplingAvg(uint16_t *input, uint16_t *output, int trueLength, int windowSize) {
+    uint32_t *window = (uint32_t *)malloc(windowSize * sizeof(uint32_t));
+    uint8_t count = 0;
+    uint32_t result = 500;
+    for (int i = 0; i < trueLength; i++) {
+        for (int w = 0; w < windowSize; w++) {
+            avgFilterLazy((uint32_t)input[i*windowSize + w], window, &count, &result, windowSize);
+        }
+        output[i] = input[i*windowSize ];
+    }
+    free(window);
+}
+
 void Opt_ADC_Value(uint16_t* adc_value, uint16_t* filteredValues, uint8_t MedWindowSize, uint8_t AvgWindowSize,uint16_t num,uint16_t pre,uint16_t behind)
 {
     //1

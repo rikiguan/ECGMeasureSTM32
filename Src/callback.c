@@ -40,7 +40,8 @@ void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
 {
     if (ADCState == 0)
     {
-        memcpy(DATABuf, ADCBuf + 140, 2 * 94);
+        overSamplingAvg(DATABuf, ADCBuf + 140, 94, 4);
+        // memcpy(DATABuf, ADCBuf + 140, 2 * 94);
         memcpy(ADCBuf, ADCBuf + 188, 2 * 140);
         ADCState = 1;
         Opt_ADC_Value(ADCBuf + 140 - 140, ProcessedBuf + 188 * ADCProcessedBufState, 3, 2, 94, 70, 70);
@@ -53,8 +54,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
     if (ADCState == 1)
     {
-
-        memcpy(DATABuf + 94, ADCBuf + 94 + 140, 2 * 94);
+        overSamplingAvg(DATABuf+ 94*4, ADCBuf + 140+94, 94, 4);
+        // memcpy(DATABuf + 94, ADCBuf + 94 + 140, 2 * 94);
         ADCState = 2;
         Opt_ADC_Value(ADCBuf + 140 - 140 + 94, ProcessedBuf + 188 * ADCProcessedBufState + 94, 3, 2, 94, 70, 70);
         ADCProcessedBufState = (ADCProcessedBufState + 1) % 3;
